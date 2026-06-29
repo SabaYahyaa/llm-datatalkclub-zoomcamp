@@ -11,3 +11,6 @@ __pycache__/
 feq.db
 *.db-shm
 *.db-wal
+
+# DBChroma
+chroma_db
