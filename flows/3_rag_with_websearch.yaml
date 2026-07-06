@@ -1,0 +1,69 @@
+# id: 3_rag_with_websearch
+# namespace: zoomcamp
+
+# description: |
+#   This flow demonstrates RAG (Retrieval Augmented Generation) by means of a live web search to look up Kestra release information and answer questions accurately.
+  
+#   Compare this with 2_chat_with_rag.yaml which uses static content ingestion and an embedding store.
+
+# tasks:
+#   - id: chat_with_rag_and_websearch_content_retriever
+#     type: io.kestra.plugin.ai.rag.ChatCompletion
+#     chatProvider:
+#       type: io.kestra.plugin.ai.provider.OpenAI
+#       apiKey: "{{ secret('OPENAI_API_KEY') }}"
+#       modelName: gpt-5-mini
+#     contentRetrievers:
+#       - type: io.kestra.plugin.ai.retriever.TavilyWebSearch
+#         apiKey: "{{ secret('TAVILY_API_KEY') }}"
+#     systemMessage: You are a helpful assistant that can answer questions about Kestra.
+#     prompt: What is the latest release of Kestra?
+
+########################################################################
+# 1) Chat + RAG step
+# A. Takes your question
+# B. Calls Tavily (web search tool for AI agents), TavilyWebSearch to search the internet for “Kestra latest release”, blog posts, docs, and GitHub releases SoC. Sends everything to Ollama (LLM)
+# # C. Sends everything to Ollama (LLM) to the model: qwen2.5:3b-instruct
+# SYSTEM:
+# You are a helpful assistant about Kestra
+
+# CONTEXT (from Tavily):
+# - release notes
+# - blog snippets
+# - docs
+
+# QUESTION:
+# What is the latest release of Kestra?
+
+# D. LLM generates answer
+# Kestra 1.1 is the latest release..
+# outputs.chat_with_rag_and_websearch_content_retriever.textOutput
+
+# 2) Log step (you added this)
+
+#######################################################################
+id: 3_rag_with_websearch
+namespace: zoomcamp
+
+description: |
+  This flow demonstrates RAG (Retrieval Augmented Generation) by means of a live web search to look up Kestra release information and answer questions accurately.
+  
+  Compare this with 2_chat_with_rag.yaml which uses static content ingestion and an embedding store.
+
+tasks:
+  - id: chat_with_rag_and_websearch_content_retriever
+    type: io.kestra.plugin.ai.rag.ChatCompletion
+    chatProvider:
+      type: io.kestra.plugin.ai.provider.OpenAI
+      baseUrl: http://ollama:11434/v1
+      apiKey: dummy
+      modelName: qwen2.5:3b-instruct
+    contentRetrievers:
+      - type: io.kestra.plugin.ai.retriever.TavilyWebSearch
+        apiKey: "{{ secret('TAVILY_API_KEY') }}"
+    systemMessage: You are a helpful assistant that can answer questions about Kestra.
+    prompt: What is the latest release of Kestra?
+
+  - id: log_result
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ outputs.chat_with_rag_and_websearch_content_retriever.textOutput }}"

@@ -61,6 +61,30 @@ docker run -it \
 
 Then be sure that the installation is correct: docker pa, you need to get pgvector container, if not do: docker start pgvector
 
+# set up Kestra in Ubuntu under Window
+1. Set up ollama host to be:  OLLAMA_HOST=0.0.0.0:11434 so Ubuntu can use Ollama models from Windows (WSL → Windows communication setup)
+    1.1. check Ollama locally (Windows), in PowerShell: Invoke-RestMethod http://localhost:11434/api/tags
+    1.2. Try to access it from WSL, in Ubuntu: curl http://10.255.255.254:11434 
+    1.3. If it is failed, check the Window listening, in PowerShell; netstat -ano | findstr 11434, you need to get:: 0.0.0.0:11434 LISTENING
+    1.4. Find a way to reach Ollama in WSL, in Ubuntu write; curl http://$(ip route | grep default | awk '{print $3}'):11434/api/tags
+    1.5.if you get error in kestra, then change do the following to set the url of the ollama server in power shell;  in Power shell; taskkill /F /IM ollama.ex  then setx OLLAMA_HOST 0.0.0.0:11434, then ollama serve, then netstat -ano | findstr 11434  you need to have 0.0.0.0:11434 LISTENING
+    1.6. if it is not working, run ollama in Docker also::  docker run -d --name ollama -p 11434:11434 ollama/ollama
+    1.6.1 pull models inside docker: docker exec -it ollama ollama pull qwen2.5:3b-instruct
+    1.6.2 docker exec -it ollama ollama pull gemma3:4b
+    1.6.3 if you still have problem check the network the kestra and ollam have to be on the same docker network, check the network by: docker network ls
+    1.6.4. if the network is different change ollam network so that kestra can see it by: docker network connect llm_datatalkclub_zoomcamp_default ollama, where llm_datatalkclub_zoomcamp_default is the kestra network by default during setting
+    1.6.5 check if kestra can reach ollama, docker exec -it llm_datatalkclub_zoomcamp-kestra-1  curl http://ollama:11434/v1/models, you should see the models that you pulled for example: {"object":"list","data":[{"id":"qwen2.5:3b-instruct","object":"model","created":1782994243,"owned_by":"library"}]}
+2. Open Ubuntu, cd /mnt/c/Username/llm_datatalkclub_zoomcam
+3. run: docker compose up -d
+4. check if the docker compose takes into accounts the env variables:  docker compose exec kestra printenv | grep SECRET
+5. for stop the docker compose file: docker compose down --remove-orphans
+6. for set variable value; export SECRET_GEMINI_GOOGLE_API_STUDIO_KEY=<secret_gimini_key>
+
+# Re-run the docker conatziner
+1. Open ubuntu: and navigate to your project folder: <cd /mnt/c/Users/saba.yahyaa/llm_datatalkclub_zoomcamp>
+2. run docker compose: docker compose up -d
+3. run ollama: docker start ollama
+4. run pgvector: docker start pgvector
 
 # 🚀 Features
 
@@ -70,4 +94,5 @@ Then be sure that the installation is correct: docker pa, you need to get pgvect
 - Chat memory support
 - Step-by-step agent execution debugging
 
----
+
+
