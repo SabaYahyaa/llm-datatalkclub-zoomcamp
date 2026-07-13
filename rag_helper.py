@@ -71,7 +71,6 @@ class RAGBase:
                         num_results=self.num_results
         )
 
-
         def build_context(self, search_results):
                 lines = []
 

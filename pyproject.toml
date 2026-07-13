@@ -25,6 +25,8 @@ minsearch = ">=0.1.0,<0.2.0"
 sqlitesearch = ">=0.1.0,<0.2.0"
 psycopg = {extras = ["binary"], version = "^3.3.4"}
 langchain-postgres = "^0.0.17"
+smolagents = {extras = ["litellm"], version = "^1.26.0"}
+youtube-search = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

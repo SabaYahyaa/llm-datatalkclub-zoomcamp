@@ -28,6 +28,7 @@ def load_faq_data():
 
 
 def build_index(documents):
+    """Text Serch"""
     # 1.2. Get your data set, documents (a list of dictionaries)
     index = Index(
         text_fields=["question", "section", "answer"], # fields that conatin useful information to get the answer (fields that are used to perfom search)
@@ -38,5 +39,15 @@ def build_index(documents):
     return index
 
 
+def text_search(query, search_index, boost_dict = {"question": 3.0, "section": 0.5}):
+    """
+        search_id is the minsearch index that is fitted with the documents
+        we use it for building ground truth, then we emphasize the question
+    """
+    return search_index.search(
+        query,
+        num_results=5,
+        boost_dict=boost_dict
+    )
 if __name__ == "__main__":
     print('y')
